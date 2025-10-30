@@ -1,0 +1,59 @@
+{
+  "id": "test-workflow-123",
+  "name": "Test Customer Support",
+  "description": "Testing workflow execution",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "type": "trigger",
+      "label": "User Message",
+      "config": {
+        "event": "chat.message"
+      }
+    },
+    {
+      "id": "memory-1",
+      "type": "memory",
+      "label": "Load Context",
+      "config": {
+        "operation": "read",
+        "limit": 3
+      }
+    },
+    {
+      "id": "llm-1",
+      "type": "llm",
+      "label": "Generate Response",
+      "config": {
+        "model": "gpt-4o-mini",
+        "temperature": 0.7,
+        "systemPrompt": "You are a helpful assistant."
+      }
+    },
+    {
+      "id": "action-1",
+      "type": "action",
+      "label": "Send Response",
+      "config": {
+        "type": "stream"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger-1",
+      "to": "memory-1"
+    },
+    {
+      "from": "memory-1",
+      "to": "llm-1"
+    },
+    {
+      "from": "llm-1",
+      "to": "action-1"
+    }
+  ],
+  "createdAt": "2025-10-29T00:00:00Z",
+  "updatedAt": "2025-10-30T03:40:06.849Z",
+  "version": 1
+}

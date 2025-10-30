@@ -1,0 +1,70 @@
+{
+  "id": "customer-support-v1",
+  "name": "Customer Support Agent",
+  "description": "Automated customer support with memory and LLM reasoning",
+  "createdAt": "2025-10-29T00:00:00Z",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "type": "trigger",
+      "label": "User Message",
+      "config": {
+        "event": "chat.message"
+      }
+    },
+    {
+      "id": "memory-1",
+      "type": "memory",
+      "label": "Load Context",
+      "config": {
+        "operation": "read",
+        "limit": 5
+      }
+    },
+    {
+      "id": "llm-1",
+      "type": "llm",
+      "label": "Generate Response",
+      "config": {
+        "model": "gpt-4o-mini",
+        "temperature": 0.7
+      }
+    },
+    {
+      "id": "memory-2",
+      "type": "memory",
+      "label": "Save Conversation",
+      "config": {
+        "operation": "write"
+      }
+    },
+    {
+      "id": "action-1",
+      "type": "action",
+      "label": "Send Response",
+      "config": {
+        "type": "stream"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "trigger-1",
+      "to": "memory-1"
+    },
+    {
+      "from": "memory-1",
+      "to": "llm-1"
+    },
+    {
+      "from": "llm-1",
+      "to": "memory-2"
+    },
+    {
+      "from": "memory-2",
+      "to": "action-1"
+    }
+  ],
+  "updatedAt": "2025-10-30T08:42:01.394Z",
+  "version": 1
+}

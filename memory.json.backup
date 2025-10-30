@@ -1,0 +1,27 @@
+{"id":"1761752048406","timestamp":1761752048406,"text":"Hi! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T15:34:07.454Z"}}
+{"id":"1761752048415","timestamp":1761752048415,"text":"Say: Hi","metadata":{"role":"user","timestamp":"2025-10-29T15:34:07.454Z"}}
+{"id":"1761752185377","timestamp":1761752185378,"text":"Direct test message","metadata":{"role":"user","timestamp":"2025-10-29T12:00:00Z"}}
+{"id":"1761752260625","timestamp":1761752260625,"text":"Test! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T15:37:40.179Z"}}
+{"id":"1761752260626","timestamp":1761752260626,"text":"Say: Test","metadata":{"role":"user","timestamp":"2025-10-29T15:37:40.178Z"}}
+{"id":"1761752347519","timestamp":1761752347519,"text":"Hello","metadata":{"role":"user","timestamp":"2025-10-29T15:39:07.257Z"}}
+{"id":"1761752347583","timestamp":1761752347583,"text":"Hello! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T15:39:07.257Z"}}
+{"id":"1761752353122","timestamp":1761752353122,"text":"Final test","metadata":{"role":"user"}}
+{"id":"1761753802626","timestamp":1761753802626,"text":"Test","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:03:22.210Z"}}
+{"id":"1761753802627","timestamp":1761753802627,"text":"Say: test","metadata":{"role":"user","timestamp":"2025-10-29T16:03:22.210Z"}}
+{"id":"1761753903713","timestamp":1761753903713,"text":"Test successful! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:05:03.217Z"}}
+{"id":"1761753903714","timestamp":1761753903714,"text":"test","metadata":{"role":"user","timestamp":"2025-10-29T16:05:03.217Z"}}
+{"id":"1761753919263","timestamp":1761753919263,"text":"ahh, shit, i forgot, what did i said?","metadata":{"role":"user","timestamp":"2025-10-29T16:05:18.717Z"}}
+{"id":"1761753919363","timestamp":1761753919363,"text":"You just said \"hi\" and then \"test.\" How can I help you further?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:05:18.717Z"}}
+{"id":"1761753928328","timestamp":1761753928328,"text":"Glad to hear that! What’s on your mind?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:05:27.985Z"}}
+{"id":"1761753928330","timestamp":1761753928330,"text":"nicee man! ","metadata":{"role":"user","timestamp":"2025-10-29T16:05:27.985Z"}}
+{"id":"1761753930417","timestamp":1761753930417,"text":"test","metadata":{"role":"user","timestamp":"2025-10-29T16:05:30.099Z"}}
+{"id":"1761753930418","timestamp":1761753930418,"text":"Test successful! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:05:30.099Z"}}
+{"id":"1761755129149","timestamp":1761755129149,"text":"test","metadata":{"role":"user","timestamp":"2025-10-29T16:25:28.785Z"}}
+{"id":"1761755129151","timestamp":1761755129151,"text":"Test successful! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:25:28.785Z"}}
+{"id":"1761755270798","timestamp":1761755270798,"text":"Hi there! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-29T16:27:17.164Z"}}
+{"id":"1761755305718","timestamp":1761755305718,"text":"hi","metadata":{"role":"user","timestamp":"2025-10-29T16:27:17.164Z"}}
+{"0":"w","1":"a","2":"i","3":"t","4":" ","5":"w","6":"h","7":"a","8":"t","9":" ","10":"i","11":" ","12":"s","13":"a","14":"i","15":"d","16":" ","17":"t","18":"o","19":" ","20":"y","21":"o","22":"u","23":"?","24":" ","25":"b","26":"e","27":"f","28":"o","29":"r","30":"e","31":"?","32":" ","id":"1761796709588","timestamp":1761796709588}
+{"id":"1761797476438","timestamp":1761797476438,"text":"Say hello","metadata":{"role":"user","timestamp":"2025-10-30T04:11:16.182Z"}}
+{"id":"1761797476446","timestamp":1761797476446,"text":"Hello! How can I assist you today?","metadata":{"role":"assistant","finishReason":"stop","timestamp":"2025-10-30T04:11:16.182Z"}}
+{"id":"1761797567490","timestamp":1761797567490,"text":"hey","metadata":{"role":"user","timestamp":"2025-10-30T04:12:47.490Z"}}
+{"id":"1761811163353","timestamp":1761811163353,"text":"hey","metadata":{"role":"user","timestamp":"2025-10-30T07:59:23.353Z"}}
