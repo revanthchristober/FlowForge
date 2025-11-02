@@ -1,0 +1,38 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.memory_items (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  workflow_id uuid,
+  text text NOT NULL,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT memory_items_pkey PRIMARY KEY (id),
+  CONSTRAINT memory_items_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT memory_items_workflow_id_fkey FOREIGN KEY (workflow_id) REFERENCES public.workflows(id)
+);
+CREATE TABLE public.users (
+  id uuid NOT NULL,
+  email text NOT NULL UNIQUE,
+  name text,
+  avatar_url text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT users_pkey PRIMARY KEY (id),
+  CONSTRAINT users_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.workflows (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  name text NOT NULL,
+  description text,
+  nodes jsonb NOT NULL DEFAULT '[]'::jsonb,
+  edges jsonb NOT NULL DEFAULT '[]'::jsonb,
+  is_public boolean DEFAULT false,
+  version integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT workflows_pkey PRIMARY KEY (id),
+  CONSTRAINT workflows_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
