@@ -4,15 +4,16 @@ import { useRouter } from "next/navigation";
 import { FlowNode, FlowEdge } from "@/lib/flows/types";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 import ChatSidebar from "@/components/ChatSidebar";
+import UserMenu from "@/components/UserMenu";
 import { customerSupportFlow } from "@/lib/flows/samples";
 import type { Workflow } from "@/lib/workflows/store";
 import { supabase } from "@/lib/supabase/client";
-import { signOut } from "@/lib/supabase/auth";
 
 export default function Page() {
   const router = useRouter();
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
   const [nodes, setNodes] = useState<FlowNode[]>([]);
@@ -37,6 +38,27 @@ export default function Page() {
     errorContainer: "#F9DEDC",
     onErrorContainer: "#410E0B",
   };
+
+  // Load theme from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('flowforge-theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  // Save theme to localStorage and apply to document
+  useEffect(() => {
+    localStorage.setItem('flowforge-theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.body.style.background = '#121212';
+      document.body.style.color = '#FFFFFF';
+    } else {
+      document.body.style.background = '#FEF7FF'; // colors.surface
+      document.body.style.color = '#1D1B20'; // colors.onSurface
+    }
+  }, [theme]);
 
   // Show toast notification
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -222,11 +244,8 @@ export default function Page() {
     }
   };
 
-  const handleSignOut = async () => {
-    const { error } = await signOut();
-    if (!error) {
-      router.push('/signin');
-    }
+  const handleThemeChange = (newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
   };
 
   // Show loading screen while checking authentication
@@ -355,51 +374,16 @@ export default function Page() {
             ➕ New Workflow
           </button>
           
-          {/* User Menu / Sign Out */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '8px 16px',
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '20px',
-          }}>
-            {userEmail && (
-              <span style={{
-                fontSize: '14px',
-                color: '#FFFFFF',
-                maxWidth: '150px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>
-                {userEmail}
-              </span>
-            )}
-            <button
-              onClick={handleSignOut}
-              style={{
-                padding: '6px 12px',
-                background: 'rgba(255,255,255,0.2)',
-                color: '#FFFFFF',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: '16px',
-                fontSize: '13px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-              }}
-              title="Sign Out"
-            >
-              🚪 Sign Out
-            </button>
-          </div>
+          {/* User Menu - Avatar Button */}
+          {userEmail && (
+            <UserMenu
+              userEmail={userEmail}
+              colors={colors}
+              theme={theme}
+              onThemeChange={handleThemeChange}
+              onShowToast={showToast}
+            />
+          )}
         </div>
       </header>
 
