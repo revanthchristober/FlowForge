@@ -12,6 +12,11 @@ interface UserProfile {
   avatar_url: string | null;
 }
 
+interface AuthProviderInfo {
+  provider: string; // 'email' | 'google' | etc.
+  isOAuth: boolean; // true if OAuth provider (Google, etc.)
+}
+
 interface UserMenuProps {
   userEmail: string | null;
   colors: {
@@ -36,6 +41,7 @@ export default function UserMenu({ userEmail, colors, theme, onThemeChange, onSh
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [authProvider, setAuthProvider] = useState<AuthProviderInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -88,6 +94,19 @@ export default function UserMenu({ userEmail, colors, theme, onThemeChange, onSh
           // PGRST116 = no rows returned (not an error we care about)
           console.error('Error fetching profile from database:', dbError);
         }
+
+        // Detect auth provider (email/password vs OAuth)
+        // Check identities array or app_metadata.provider
+        const identities = (authUser as any).identities || [];
+        const provider = identities.length > 0 
+          ? identities[0].provider 
+          : (authUser.app_metadata?.provider || 'email');
+        
+        const providerInfo: AuthProviderInfo = {
+          provider: provider,
+          isOAuth: provider !== 'email', // OAuth if not 'email'
+        };
+        setAuthProvider(providerInfo);
 
         // Merge data: prioritize Google avatar from auth metadata, fallback to DB
         const profileData: UserProfile = {
@@ -379,6 +398,7 @@ export default function UserMenu({ userEmail, colors, theme, onThemeChange, onSh
       {showSettings && (
         <SettingsModal
           profile={profile}
+          authProvider={authProvider}
           onClose={() => setShowSettings(false)}
           onUpdate={(updatedProfile) => {
             setProfile(updatedProfile);
@@ -410,6 +430,7 @@ export default function UserMenu({ userEmail, colors, theme, onThemeChange, onSh
 // Settings Modal Component
 interface SettingsModalProps {
   profile: UserProfile | null;
+  authProvider: AuthProviderInfo | null;
   onClose: () => void;
   onUpdate: (profile: UserProfile) => void;
   colors: UserMenuProps['colors'];
@@ -417,27 +438,93 @@ interface SettingsModalProps {
   onShowToast: (message: string, type: 'success' | 'error') => void;
 }
 
-function SettingsModal({ profile, onClose, onUpdate, colors, theme, onShowToast }: SettingsModalProps) {
+function SettingsModal({ profile, authProvider, onClose, onUpdate, colors, theme, onShowToast }: SettingsModalProps) {
   const [name, setName] = useState(profile?.name || '');
+  const [email, setEmail] = useState(profile?.email || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  // Check if email can be edited (only for email/password accounts, not OAuth)
+  const canEditEmail = authProvider?.provider === 'email' && !authProvider?.isOAuth;
+
+  // Update state when profile changes
+  useEffect(() => {
+    if (profile) {
+      setName(profile.name || '');
+      setEmail(profile.email || '');
+    }
+  }, [profile]);
+
+  // Email validation helper
+  const validateEmailFormat = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSave = async () => {
     if (!profile) return;
 
+    // Validate email if it's editable and changed
+    if (canEditEmail && email !== profile.email) {
+      if (!email.trim()) {
+        setEmailError('Email is required');
+        return;
+      }
+      if (!validateEmailFormat(email)) {
+        setEmailError('Please enter a valid email address');
+        return;
+      }
+    }
+
     setIsSaving(true);
+    setEmailError(null);
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         onShowToast('Not authenticated', 'error');
+        setIsSaving(false);
         return;
+      }
+
+      // Update email in auth if changed and editable
+      let emailUpdated = false;
+      if (canEditEmail && email.trim() !== profile.email) {
+        const { error: emailError } = await supabase.auth.updateUser({
+          email: email.trim(),
+        });
+
+        if (emailError) {
+          console.error('Error updating email:', emailError);
+          setEmailError(emailError.message || 'Failed to update email');
+          setIsSaving(false);
+          return;
+        }
+
+        emailUpdated = true;
+        
+        // Email change requires verification
+        // Supabase will send a verification email automatically
+        onShowToast(
+          'Email updated! Please check your new email to verify it.',
+          'success'
+        );
+      }
+
+      // Update name and email in database
+      const updateData: any = {
+        name: name.trim() || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Only update email in DB if it was successfully updated in auth
+      if (emailUpdated) {
+        updateData.email = email.trim();
       }
 
       const { data, error } = await supabase
         .from('users')
-        .update({
-          name: name.trim() || null,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', user.id)
         .select()
         .single();
@@ -447,7 +534,10 @@ function SettingsModal({ profile, onClose, onUpdate, colors, theme, onShowToast 
         onShowToast('Failed to update profile', 'error');
       } else if (data) {
         onUpdate(data);
-        onClose();
+        // Only close if email wasn't changed (to show verification message)
+        if (!emailUpdated) {
+          onClose();
+        }
       }
     } catch (error) {
       console.error('Failed to update profile:', error);
@@ -514,6 +604,7 @@ function SettingsModal({ profile, onClose, onUpdate, colors, theme, onShowToast 
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter your name"
+            disabled={isSaving}
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -524,11 +615,115 @@ function SettingsModal({ profile, onClose, onUpdate, colors, theme, onShowToast 
               color: theme === 'dark' ? '#FFFFFF' : colors.onSurface,
               outline: 'none',
               boxSizing: 'border-box',
+              opacity: isSaving ? 0.7 : 1,
             }}
             onFocus={(e) => (e.currentTarget.style.borderColor = colors.primary)}
             onBlur={(e) => (e.currentTarget.style.borderColor = colors.outline)}
           />
         </div>
+
+        {/* Email field - only for email/password accounts */}
+        {canEditEmail ? (
+          <div style={{ marginBottom: '20px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: theme === 'dark' ? '#FFFFFF' : colors.onSurface,
+                marginBottom: '8px',
+              }}
+            >
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError(null);
+              }}
+              placeholder="Enter your email"
+              disabled={isSaving}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: `1px solid ${emailError ? colors.error : colors.outline}`,
+                borderRadius: '12px',
+                fontSize: '16px',
+                background: theme === 'dark' ? '#2C2C2C' : colors.surface,
+                color: theme === 'dark' ? '#FFFFFF' : colors.onSurface,
+                outline: 'none',
+                boxSizing: 'border-box',
+                opacity: isSaving ? 0.7 : 1,
+              }}
+              onFocus={(e) => (e.currentTarget.style.borderColor = colors.primary)}
+              onBlur={(e) => (e.currentTarget.style.borderColor = emailError ? colors.error : colors.outline)}
+            />
+            {emailError && (
+              <div
+                style={{
+                  fontSize: '12px',
+                  color: colors.error,
+                  marginTop: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <span>⚠️</span>
+                {emailError}
+              </div>
+            )}
+            <div
+              style={{
+                fontSize: '12px',
+                color: theme === 'dark' ? '#B0B0B0' : colors.onSurfaceVariant,
+                marginTop: '4px',
+              }}
+            >
+              ℹ️ Changing your email requires verification
+            </div>
+          </div>
+        ) : (
+          /* Read-only email for OAuth accounts */
+          <div style={{ marginBottom: '20px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: theme === 'dark' ? '#FFFFFF' : colors.onSurface,
+                marginBottom: '8px',
+              }}
+            >
+              Email Address
+            </label>
+            <div
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: `1px solid ${colors.outline}40`,
+                borderRadius: '12px',
+                fontSize: '16px',
+                background: theme === 'dark' ? '#2C2C2C' : colors.surfaceVariant,
+                color: theme === 'dark' ? '#B0B0B0' : colors.onSurfaceVariant,
+                boxSizing: 'border-box',
+              }}
+            >
+              {profile?.email || 'No email'}
+            </div>
+            <div
+              style={{
+                fontSize: '12px',
+                color: theme === 'dark' ? '#B0B0B0' : colors.onSurfaceVariant,
+                marginTop: '4px',
+              }}
+            >
+              ℹ️ Email is managed by {authProvider?.provider === 'google' ? 'Google' : 'your OAuth provider'}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
           <button
