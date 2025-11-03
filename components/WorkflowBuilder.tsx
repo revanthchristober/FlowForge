@@ -47,6 +47,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
   const [panOffset, setPanOffset] = useState<Position>({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState<Position>({ x: 0, y: 0 });
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const toggleSection = (section: string) => {
@@ -142,18 +143,65 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
     setSelectedNode(nodeId);
   };
 
+  // Handle spacebar for panning
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !e.repeat) {
+        setIsSpacePressed(true);
+        if (canvasRef.current) {
+          canvasRef.current.style.cursor = 'grab';
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        setIsSpacePressed(false);
+        if (canvasRef.current && !isPanning && !draggedNode) {
+          canvasRef.current.style.cursor = 'default';
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [isPanning, draggedNode]);
+
   const onCanvasMouseDown = (e: React.MouseEvent) => {
-    // Middle mouse button for panning
-    if (e.button === 1) {
-      setIsPanning(true);
-      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
-      e.preventDefault();
+    // Don't pan if clicking on a node or interactive element
+    const target = e.target as HTMLElement;
+    const isNode = target.closest('.workflow-node');
+    const isInteractive = target.closest('button') || target.closest('svg') || target.closest('input') || target.closest('textarea') || target.closest('circle') || target.closest('text');
+    
+    if (isNode || isInteractive) {
+      return; // Let the node or interactive element handle the click
     }
-    // Right click also enables panning
-    if (e.button === 2) {
+
+    // Panning methods:
+    // 1. Left mouse button (0) + Spacebar = panning
+    // 2. Middle mouse button (1) = panning
+    // 3. Right mouse button (2) = panning
+    // 4. Left mouse button (0) on empty canvas = panning (NEW - Main feature)
+    if (
+      (e.button === 0 && isSpacePressed) || // Left click + Spacebar
+      e.button === 1 || // Middle mouse button
+      e.button === 2 || // Right click
+      (e.button === 0 && !draggedNode && !isNode && !isInteractive) // Left click on empty canvas
+    ) {
       setIsPanning(true);
       setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
       e.preventDefault();
+      e.stopPropagation();
+      
+      // Update cursor
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = 'grabbing';
+      }
     }
   };
 
@@ -185,6 +233,15 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
   const onMouseUp = () => {
     setDraggedNode(null);
     setIsPanning(false);
+    
+    // Reset cursor
+    if (canvasRef.current) {
+      if (isSpacePressed) {
+        canvasRef.current.style.cursor = 'grab';
+      } else {
+        canvasRef.current.style.cursor = 'default';
+      }
+    }
   };
 
   const onWheel = (e: React.WheelEvent) => {
@@ -390,6 +447,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
             return (
               <div
                 key={node.id}
+                className="workflow-node"
                 onMouseDown={(e) => onMouseDown(node.id, e)}
                 style={{
                   position: 'absolute',
