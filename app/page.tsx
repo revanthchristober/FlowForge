@@ -1,12 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { FlowNode, FlowEdge } from "@/lib/flows/types";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 import ChatSidebar from "@/components/ChatSidebar";
 import { customerSupportFlow } from "@/lib/flows/samples";
 import type { Workflow } from "@/lib/workflows/store";
+import { supabase } from "@/lib/supabase/client";
+import { signOut } from "@/lib/supabase/auth";
 
 export default function Page() {
+  const router = useRouter();
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
   const [nodes, setNodes] = useState<FlowNode[]>([]);
@@ -38,10 +44,41 @@ export default function Page() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.push('/signin');
+        return;
+      }
+
+      setUserEmail(session.user.email || null);
+      setIsAuthChecking(false);
+    };
+
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        router.push('/signin');
+      } else if (event === 'SIGNED_IN' && session) {
+        setUserEmail(session.user.email || null);
+        setIsAuthChecking(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
   // Load workflows on mount
   useEffect(() => {
-    loadWorkflows();
-  }, []);
+    if (!isAuthChecking) {
+      loadWorkflows();
+    }
+  }, [isAuthChecking]);
 
   const loadWorkflows = async () => {
     try {
@@ -185,6 +222,48 @@ export default function Page() {
     }
   };
 
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (!error) {
+      router.push('/signin');
+    }
+  };
+
+  // Show loading screen while checking authentication
+  if (isAuthChecking) {
+    return (
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: colors.surface,
+        fontFamily: 'Roboto, system-ui, -apple-system, sans-serif',
+      }}>
+        <div style={{ fontSize: '80px', marginBottom: '20px' }}>⚡</div>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          border: `4px solid ${colors.primaryContainer}`,
+          borderTop: `4px solid ${colors.primary}`,
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }} />
+        <p style={{ marginTop: '20px', fontSize: '16px', color: colors.onSurfaceVariant }}>
+          Loading FlowForge...
+        </p>
+        <style jsx>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       width: '100vw',
@@ -275,6 +354,52 @@ export default function Page() {
           >
             ➕ New Workflow
           </button>
+          
+          {/* User Menu / Sign Out */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '8px 16px',
+            background: 'rgba(255,255,255,0.2)',
+            borderRadius: '20px',
+          }}>
+            {userEmail && (
+              <span style={{
+                fontSize: '14px',
+                color: '#FFFFFF',
+                maxWidth: '150px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}>
+                {userEmail}
+              </span>
+            )}
+            <button
+              onClick={handleSignOut}
+              style={{
+                padding: '6px 12px',
+                background: 'rgba(255,255,255,0.2)',
+                color: '#FFFFFF',
+                border: '1px solid rgba(255,255,255,0.3)',
+                borderRadius: '16px',
+                fontSize: '13px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+              }}
+              title="Sign Out"
+            >
+              🚪 Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
