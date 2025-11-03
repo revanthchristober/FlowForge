@@ -635,7 +635,7 @@ export default function Page() {
                       borderRadius: '10px',
                       fontSize: '14px',
                       background: 'var(--bg-card)',
-                      color: colors.outline
+                      color: colors.onSurface
                     }}
                   />
                 </div>
