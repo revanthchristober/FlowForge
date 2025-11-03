@@ -5,15 +5,16 @@ import { FlowNode, FlowEdge } from "@/lib/flows/types";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 import ChatSidebar from "@/components/ChatSidebar";
 import UserMenu from "@/components/UserMenu";
+import { useTheme } from "@/components/ThemeProvider";
 import { customerSupportFlow } from "@/lib/flows/samples";
 import type { Workflow } from "@/lib/workflows/store";
 import { supabase } from "@/lib/supabase/client";
 
 export default function Page() {
   const router = useRouter();
+  const { theme, setTheme: setThemeState } = useTheme();
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
   const [nodes, setNodes] = useState<FlowNode[]>([]);
@@ -24,41 +25,22 @@ export default function Page() {
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{message: string, onConfirm: () => void} | null>(null);
 
-  // Material You Color Tokens
+  // Material You Color Tokens - using CSS variables for theme support
   const colors = {
-    primary: "#6750A4",
-    primaryContainer: "#EADDFF",
-    secondary: "#625B71",
-    secondaryContainer: "#E8DEF8",
-    surface: "#FEF7FF",
-    surfaceVariant: "#E7E0EC",
-    onSurface: "#1D1B20",
-    outline: "#79747E",
-    error: "#B3261E",
-    errorContainer: "#F9DEDC",
-    onErrorContainer: "#410E0B",
+    primary: 'var(--color-primary)',
+    primaryContainer: 'var(--color-primary-container)',
+    secondary: 'var(--color-secondary)',
+    secondaryContainer: 'var(--color-secondary-container)',
+    surface: 'var(--color-surface)',
+    surfaceVariant: 'var(--color-surface-variant)',
+    surfaceContainerHigh: 'var(--color-surface-container-high)',
+    onSurface: 'var(--color-on-surface)',
+    onSurfaceVariant: 'var(--color-on-surface-variant)',
+    outline: 'var(--color-outline)',
+    error: 'var(--color-error)',
+    errorContainer: 'var(--color-error-container)',
+    onErrorContainer: 'var(--color-on-error-container)',
   };
-
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('flowforge-theme') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
-
-  // Save theme to localStorage and apply to document
-  useEffect(() => {
-    localStorage.setItem('flowforge-theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    if (theme === 'dark') {
-      document.body.style.background = '#121212';
-      document.body.style.color = '#FFFFFF';
-    } else {
-      document.body.style.background = '#FEF7FF'; // colors.surface
-      document.body.style.color = '#1D1B20'; // colors.onSurface
-    }
-  }, [theme]);
 
   // Show toast notification
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -245,7 +227,7 @@ export default function Page() {
   };
 
   const handleThemeChange = (newTheme: 'light' | 'dark') => {
-    setTheme(newTheme);
+    setThemeState(newTheme);
   };
 
   // Show loading screen while checking authentication
@@ -258,7 +240,7 @@ export default function Page() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: colors.surface,
+                background: 'var(--bg-primary)',
         fontFamily: 'Roboto, system-ui, -apple-system, sans-serif',
       }}>
         <div style={{ fontSize: '80px', marginBottom: '20px' }}>⚡</div>
@@ -289,7 +271,7 @@ export default function Page() {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: colors.surface,
+                background: 'var(--bg-primary)',
       fontFamily: 'Roboto, system-ui, -apple-system, sans-serif',
       overflow: 'hidden'
     }}>
@@ -318,8 +300,8 @@ export default function Page() {
                 onClick={saveWorkflow}
                 style={{
                   padding: '10px 20px',
-                  background: '#4CAF50',
-                  color: '#FFFFFF',
+                  background: '#4CAF50', // Keep green for save button (accent color)
+                  color: 'var(--text-on-primary)',
                   border: 'none',
                   borderRadius: '20px',
                   fontSize: '14px',
@@ -566,7 +548,7 @@ export default function Page() {
                   style={{
                     padding: '14px 28px',
                     background: colors.primary,
-                    color: '#FFFFFF',
+                    color: 'var(--text-on-primary)',
                     border: 'none',
                     borderRadius: '28px',
                     fontSize: '16px',
@@ -636,7 +618,7 @@ export default function Page() {
                       borderRadius: '12px',
                       fontSize: '16px',
                       fontWeight: '600',
-                      background: '#FFFFFF',
+                      background: 'var(--bg-card)',
                       color: colors.onSurface,
                       marginBottom: '8px'
                     }}
@@ -652,7 +634,7 @@ export default function Page() {
                       border: `1px solid ${colors.outline}`,
                       borderRadius: '10px',
                       fontSize: '14px',
-                      background: '#FFFFFF',
+                      background: 'var(--bg-card)',
                       color: colors.outline
                     }}
                   />
@@ -715,7 +697,7 @@ export default function Page() {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              background: colors.surface,
+                background: 'var(--bg-primary)',
               borderRadius: '28px',
               padding: '24px',
               minWidth: '280px',
@@ -791,7 +773,7 @@ export default function Page() {
                 style={{
                   padding: '10px 24px',
                   background: colors.error,
-                  color: '#FFFFFF',
+                  color: 'var(--text-on-primary)',
                   border: 'none',
                   borderRadius: '20px',
                   fontSize: '14px',

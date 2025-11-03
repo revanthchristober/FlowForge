@@ -218,9 +218,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
       {/* Left Sidebar - Node Palette */}
       <div style={{
         width: '200px',
-        background: 'linear-gradient(180deg, #EADDFF 0%, #E8DEF8 100%)',
+        background: 'linear-gradient(180deg, var(--color-primary-container) 0%, var(--color-secondary-container) 100%)',
         padding: '20px',
-        borderRight: '1px solid #CAC4D0',
+        borderRight: '1px solid var(--border-light)',
         display: 'flex',
         flexDirection: 'column',
         gap: '12px'
@@ -228,7 +228,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
         <div style={{
           fontSize: '16px',
           fontWeight: '600',
-          color: '#1D1B20',
+          color: 'var(--text-primary)',
           marginBottom: '8px'
         }}>
           Add Nodes
@@ -239,7 +239,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
             onClick={() => addNode(nodeType.type)}
             style={{
               padding: '12px 16px',
-              background: '#FEF7FF',
+              background: 'var(--bg-canvas)',
               border: '1px solid ' + nodeType.color,
               borderRadius: '20px',
               cursor: 'pointer',
@@ -259,7 +259,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
               e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#FEF7FF';
+              e.currentTarget.style.background = 'var(--bg-canvas)';
               e.currentTarget.style.color = nodeType.color;
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
@@ -281,10 +281,10 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
           background: 'rgba(255, 255, 255, 0.95)',
           padding: '8px 16px',
           borderRadius: '20px',
-          border: '1px solid #CAC4D0',
+          border: '1px solid var(--border-light)',
           fontSize: '14px',
           fontWeight: '600',
-          color: '#6750A4',
+          color: 'var(--color-primary)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           zIndex: 100,
           userSelect: 'none'
@@ -302,9 +302,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
           style={{
             flex: 1,
             position: 'relative',
-            background: '#FEF7FF',
+            background: 'var(--bg-canvas)',
             backgroundImage: `
-              radial-gradient(circle, #E7E0EC 1px, transparent 1px)
+              radial-gradient(circle, var(--bg-canvas-grid) 1px, transparent 1px)
             `,
             backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
             backgroundPosition: `${panOffset.x}px ${panOffset.y}px`,
@@ -395,8 +395,8 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                   width: '150px',
                   transform: `scale(${zoom})`,
                   transformOrigin: 'top left',
-                  background: isSelected ? nodeTypeInfo?.color : '#FFFFFF',
-                  color: isSelected ? '#FFFFFF' : '#1D1B20',
+                  background: isSelected ? nodeTypeInfo?.color : 'var(--bg-card)',
+                  color: isSelected ? 'var(--text-on-primary)' : 'var(--text-primary)',
                   border: `2px solid ${isConnecting ? '#FFC107' : nodeTypeInfo?.color}`,
                   borderRadius: '16px',
                   padding: '12px',
@@ -511,8 +511,8 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
               width: '32px',
               height: '32px',
               borderRadius: '16px',
-              background: '#6750A4',
-              color: '#FFFFFF',
+              background: 'var(--color-primary)',
+              color: 'var(--text-on-primary)',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -524,11 +524,11 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
               zIndex: 10
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#7965AF';
+              e.currentTarget.style.background = 'var(--color-primary-container)';
               e.currentTarget.style.boxShadow = '0px 4px 8px 0px rgba(0,0,0,0.3)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#6750A4';
+              e.currentTarget.style.background = 'var(--color-primary)';
               e.currentTarget.style.boxShadow = '0px 2px 4px 0px rgba(0,0,0,0.2)';
             }}
           >
@@ -545,7 +545,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
               <div style={{
                 fontSize: '16px',
                 fontWeight: '600',
-                color: '#1D1B20',
+                color: 'var(--text-primary)',
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -558,9 +558,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {/* Basic Properties Section */}
             <div style={{
-              background: '#FEF7FF',
+              background: 'var(--bg-canvas)',
               borderRadius: '16px',
-              border: '1px solid #CAC4D0',
+              border: '1px solid var(--border-light)',
               overflow: 'hidden'
             }}>
               <button
@@ -594,7 +594,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       display: 'block',
                       fontSize: '12px',
                       fontWeight: '600',
-                      color: '#49454F',
+                      color: 'var(--text-secondary)',
                       marginBottom: '6px'
                     }}>
                       Label
@@ -606,10 +606,10 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       style={{
                         width: '100%',
                         padding: '10px 12px',
-                        border: '1px solid #79747E',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '12px',
                         fontSize: '14px',
-                        background: '#FFFFFF',
+                        background: 'var(--bg-card)',
                         color: '#1D1B20'
                       }}
                     />
@@ -620,7 +620,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       display: 'block',
                       fontSize: '12px',
                       fontWeight: '600',
-                      color: '#49454F',
+                      color: 'var(--text-secondary)',
                       marginBottom: '6px'
                     }}>
                       Type
@@ -630,7 +630,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       background: '#E7E0EC',
                       borderRadius: '12px',
                       fontSize: '14px',
-                      color: '#49454F',
+                      color: 'var(--text-secondary)',
                       border: '1px solid #CAC4D0'
                     }}>
                       {selectedNodeData.type}
@@ -644,9 +644,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
               <>
                 {/* Model Section */}
                 <div style={{
-                  background: '#FEF7FF',
+                  background: 'var(--bg-canvas)',
                   borderRadius: '16px',
-                  border: '1px solid #CAC4D0',
+                  border: '1px solid var(--border-light)',
                   overflow: 'hidden'
                 }}>
                   <button
@@ -684,11 +684,11 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                         style={{
                           width: '100%',
                           padding: '10px 12px',
-                          border: '1px solid #79747E',
+                          border: '1px solid var(--border-color)',
                           borderRadius: '12px',
                           fontSize: '14px',
-                          background: '#FFFFFF',
-                          color: '#1D1B20',
+                          background: 'var(--bg-card)',
+                          color: 'var(--text-primary)',
                           cursor: 'pointer'
                         }}
                       >
@@ -702,9 +702,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
 
                 {/* Temperature Section */}
                 <div style={{
-                  background: '#FEF7FF',
+                  background: 'var(--bg-canvas)',
                   borderRadius: '16px',
-                  border: '1px solid #CAC4D0',
+                  border: '1px solid var(--border-light)',
                   overflow: 'hidden'
                 }}>
                   <button
@@ -751,9 +751,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
 
                 {/* System Prompt Section */}
                 <div style={{
-                  background: '#FEF7FF',
+                  background: 'var(--bg-canvas)',
                   borderRadius: '16px',
-                  border: '1px solid #CAC4D0',
+                  border: '1px solid var(--border-light)',
                   overflow: 'hidden'
                 }}>
                   <button
@@ -793,11 +793,11 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                           width: '100%',
                           minHeight: '100px',
                           padding: '10px 12px',
-                          border: '1px solid #79747E',
+                          border: '1px solid var(--border-color)',
                           borderRadius: '12px',
                           fontSize: '14px',
-                          background: '#FFFFFF',
-                          color: '#1D1B20',
+                          background: 'var(--bg-card)',
+                          color: 'var(--text-primary)',
                           resize: 'vertical',
                           fontFamily: 'inherit'
                         }}
@@ -810,9 +810,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
 
             {selectedNodeData.type === 'memory' && (
               <div style={{
-                background: '#FEF7FF',
+                background: 'var(--bg-canvas)',
                 borderRadius: '16px',
-                border: '1px solid #CAC4D0',
+                border: '1px solid var(--border-light)',
                 overflow: 'hidden'
               }}>
                 <button
@@ -846,7 +846,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                         display: 'block',
                         fontSize: '12px',
                         fontWeight: '600',
-                        color: '#49454F',
+                        color: 'var(--text-secondary)',
                         marginBottom: '6px'
                       }}>
                         Operation
@@ -860,11 +860,11 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                         style={{
                           width: '100%',
                           padding: '10px 12px',
-                          border: '1px solid #79747E',
+                          border: '1px solid var(--border-color)',
                           borderRadius: '12px',
                           fontSize: '14px',
-                          background: '#FFFFFF',
-                          color: '#1D1B20',
+                          background: 'var(--bg-card)',
+                          color: 'var(--text-primary)',
                           cursor: 'pointer'
                         }}
                       >
@@ -878,7 +878,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                           display: 'block',
                           fontSize: '12px',
                           fontWeight: '600',
-                          color: '#49454F',
+                          color: 'var(--text-secondary)',
                           marginBottom: '6px'
                         }}>
                           Limit
@@ -893,10 +893,10 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                           style={{
                             width: '100%',
                             padding: '10px 12px',
-                            border: '1px solid #79747E',
+                            border: '1px solid var(--border-color)',
                             borderRadius: '12px',
                             fontSize: '14px',
-                            background: '#FFFFFF',
+                            background: 'var(--bg-card)',
                             color: '#1D1B20'
                           }}
                         />
@@ -909,9 +909,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
 
             {selectedNodeData.type === 'trigger' && (
               <div style={{
-                background: '#FEF7FF',
+                background: 'var(--bg-canvas)',
                 borderRadius: '16px',
-                border: '1px solid #CAC4D0',
+                border: '1px solid var(--border-light)',
                 overflow: 'hidden'
               }}>
                 <button
@@ -944,7 +944,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       display: 'block',
                       fontSize: '12px',
                       fontWeight: '600',
-                      color: '#49454F',
+                      color: 'var(--text-secondary)',
                       marginBottom: '6px'
                     }}>
                       Event Type
@@ -959,10 +959,10 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       style={{
                         width: '100%',
                         padding: '10px 12px',
-                        border: '1px solid #79747E',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '12px',
                         fontSize: '14px',
-                        background: '#FFFFFF',
+                        background: 'var(--bg-card)',
                         color: '#1D1B20'
                       }}
                     />
@@ -973,9 +973,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
 
             {selectedNodeData.type === 'action' && (
               <div style={{
-                background: '#FEF7FF',
+                background: 'var(--bg-canvas)',
                 borderRadius: '16px',
-                border: '1px solid #CAC4D0',
+                border: '1px solid var(--border-light)',
                 overflow: 'hidden'
               }}>
                 <button
@@ -1008,7 +1008,7 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       display: 'block',
                       fontSize: '12px',
                       fontWeight: '600',
-                      color: '#49454F',
+                      color: 'var(--text-secondary)',
                       marginBottom: '6px'
                     }}>
                       Action Type
@@ -1022,11 +1022,11 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                       style={{
                         width: '100%',
                         padding: '10px 12px',
-                        border: '1px solid #79747E',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '12px',
                         fontSize: '14px',
-                        background: '#FFFFFF',
-                        color: '#1D1B20',
+                        background: 'var(--bg-card)',
+                        color: 'var(--text-primary)',
                         cursor: 'pointer'
                       }}
                     >

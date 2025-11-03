@@ -29,30 +29,30 @@ export default function ChatSidebar({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Material You Design 3 colors
+  // Material You Design 3 colors - using CSS variables for theme support
   const colors = {
-    primary: "#6750A4",
-    onPrimary: "#FFFFFF",
-    primaryContainer: "#EADDFF",
-    onPrimaryContainer: "#21005D",
-    secondary: "#625B71",
-    secondaryContainer: "#E8DEF8",
-    onSecondaryContainer: "#1D192B",
-    surface: "#FEF7FF",
-    onSurface: "#1D1B20",
-    surfaceVariant: "#E7E0EC",
-    onSurfaceVariant: "#49454F",
-    surfaceContainerLow: "#F7F2FA",
-    surfaceContainer: "#F3EDF7",
-    surfaceContainerHigh: "#ECE6F0",
-    outline: "#79747E",
-    outlineVariant: "#CAC4D0",
-    error: "#B3261E",
-    errorContainer: "#F9DEDC",
-    userMessageBg: "#E8DEF8",
-    userMessageText: "#1D192B",
-    assistantMessageBg: "#FFFFFF",
-    assistantMessageText: "#1D1B20",
+    primary: "var(--color-primary)",
+    onPrimary: "var(--text-on-primary)",
+    primaryContainer: "var(--color-primary-container)",
+    onPrimaryContainer: "var(--color-on-primary-container)",
+    secondary: "var(--color-secondary)",
+    secondaryContainer: "var(--color-secondary-container)",
+    onSecondaryContainer: "var(--color-on-secondary-container)",
+    surface: "var(--color-surface)",
+    onSurface: "var(--color-on-surface)",
+    surfaceVariant: "var(--color-surface-variant)",
+    onSurfaceVariant: "var(--color-on-surface-variant)",
+    surfaceContainerLow: "var(--color-surface-container-low)",
+    surfaceContainer: "var(--color-surface-container)",
+    surfaceContainerHigh: "var(--color-surface-container-high)",
+    outline: "var(--color-outline)",
+    outlineVariant: "var(--color-outline-variant)",
+    error: "var(--color-error)",
+    errorContainer: "var(--color-error-container)",
+    userMessageBg: "var(--color-secondary-container)",
+    userMessageText: "var(--color-on-secondary-container)",
+    assistantMessageBg: "var(--bg-card)",
+    assistantMessageText: "var(--text-primary)",
   };
 
   const elevations = {
