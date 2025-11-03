@@ -14,7 +14,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -32,13 +31,13 @@ export async function GET(request: Request) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Code is required for OAuth flow
+  // If no code provided, this is likely a direct visit (not from OAuth flow)
+  // Redirect silently to signin without showing error
   if (!code) {
-    console.error('❌ No authorization code provided');
+    console.log('ℹ️ Direct access to /auth/callback (no code) - redirecting to /signin');
     
+    // Silent redirect - no error message for direct access
     const redirectUrl = new URL('/signin', requestUrl.origin);
-    redirectUrl.searchParams.set('error', 'No authorization code provided');
-    
     return NextResponse.redirect(redirectUrl);
   }
 
