@@ -428,7 +428,7 @@ export default function Page() {
               <div style={{
                 padding: '20px',
                 textAlign: 'center',
-                color: colors.outline,
+                color: colors.onSurfaceVariant,
                 fontSize: '14px'
               }}>
                 No workflows yet. Create one to get started!
@@ -438,7 +438,7 @@ export default function Page() {
                 <div
                   key={workflow.id}
                   style={{
-                    background: currentWorkflow?.id === workflow.id ? colors.primaryContainer : '#FFFFFF',
+                    background: currentWorkflow?.id === workflow.id ? colors.primaryContainer : 'var(--bg-card)',
                     border: `1px solid ${currentWorkflow?.id === workflow.id ? colors.primary : colors.outline}`,
                     borderRadius: '16px',
                     padding: '12px',
@@ -454,7 +454,7 @@ export default function Page() {
                   }}
                   onMouseLeave={(e) => {
                     if (currentWorkflow?.id !== workflow.id) {
-                      e.currentTarget.style.background = '#FFFFFF';
+                      e.currentTarget.style.background = 'var(--bg-card)';
                     }
                   }}
                 >
@@ -471,7 +471,7 @@ export default function Page() {
                   </div>
                   <div style={{
                     fontSize: '12px',
-                    color: colors.outline,
+                    color: colors.onSurfaceVariant,
                     marginBottom: '8px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -484,7 +484,7 @@ export default function Page() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     fontSize: '11px',
-                    color: colors.outline
+                    color: colors.onSurfaceVariant
                   }}>
                     <span>{workflow.nodes.length} nodes</span>
                     <button
@@ -494,8 +494,8 @@ export default function Page() {
                       }}
                       style={{
                         padding: '4px 8px',
-                        background: '#F2B8B5',
-                        color: '#B3261E',
+                        background: colors.errorContainer,
+                        color: colors.onErrorContainer,
                         border: 'none',
                         borderRadius: '8px',
                         fontSize: '11px',
@@ -535,7 +535,7 @@ export default function Page() {
               </h2>
               <p style={{
                 fontSize: '18px',
-                color: colors.outline,
+                color: colors.onSurfaceVariant,
                 maxWidth: '600px',
                 margin: 0
               }}>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { FlowNode, FlowEdge } from '@/lib/flows/types';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface WorkflowBuilderProps {
   nodes: FlowNode[];
@@ -27,6 +28,7 @@ const NODE_TYPES = [
 ];
 
 export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesChange }: WorkflowBuilderProps) {
+  const { theme } = useTheme();
   const [nodesWithPos, setNodesWithPos] = useState<NodeWithPosition[]>([]);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
@@ -278,7 +280,8 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
           position: 'absolute',
           bottom: '20px',
           right: '20px',
-          background: 'rgba(255, 255, 255, 0.95)',
+          background: 'var(--bg-card)',
+          opacity: 0.95,
           padding: '8px 16px',
           borderRadius: '20px',
           border: '1px solid var(--border-light)',
