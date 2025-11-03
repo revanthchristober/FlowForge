@@ -46,6 +46,11 @@ export async function GET(request: Request) {
   try {
     // Create Supabase client for server-side auth with proper cookie handling
     const cookieStore = await cookies();
+    
+    // Create response object first so we can set cookies on it
+    const redirectUrl = new URL('/', requestUrl.origin);
+    const response = NextResponse.redirect(redirectUrl);
+    
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -56,7 +61,10 @@ export async function GET(request: Request) {
           },
           set(name: string, value: string, options: any) {
             try {
+              // Set cookie in cookieStore
               cookieStore.set(name, value, options);
+              // Also set cookie in response headers
+              response.cookies.set(name, value, options);
             } catch (error) {
               // The `set` method was called from a Server Component.
               // This can be ignored if you have middleware refreshing
@@ -66,6 +74,7 @@ export async function GET(request: Request) {
           remove(name: string, options: any) {
             try {
               cookieStore.set(name, '', { ...options, maxAge: 0 });
+              response.cookies.set(name, '', { ...options, maxAge: 0 });
             } catch (error) {
               // The `delete` method was called from a Server Component.
               // This can be ignored if you have middleware refreshing
@@ -76,28 +85,29 @@ export async function GET(request: Request) {
       }
     );
 
-    // Exchange code for session - this will automatically set cookies
+    // Exchange code for session - this will automatically set cookies via the handlers above
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
       console.error('❌ Code exchange error:', exchangeError.message);
       
-      const redirectUrl = new URL('/signin', requestUrl.origin);
-      redirectUrl.searchParams.set('error', 'Authentication failed. Please try again.');
+      const errorRedirectUrl = new URL('/signin', requestUrl.origin);
+      errorRedirectUrl.searchParams.set('error', 'Authentication failed. Please try again.');
       
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.redirect(errorRedirectUrl);
     }
 
     if (!data.session) {
       console.error('❌ No session created');
       
-      const redirectUrl = new URL('/signin', requestUrl.origin);
-      redirectUrl.searchParams.set('error', 'Failed to create session');
+      const errorRedirectUrl = new URL('/signin', requestUrl.origin);
+      errorRedirectUrl.searchParams.set('error', 'Failed to create session');
       
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.redirect(errorRedirectUrl);
     }
 
     console.log('✅ OAuth session created for:', data.user.email);
+    console.log('✅ Redirecting to home page (/)');
 
     // Verify user profile was created (the trigger should handle this)
     // We don't need to manually create it here, just log for debugging
@@ -129,13 +139,8 @@ export async function GET(request: Request) {
       }
     }
 
-    // Successful authentication - create response with redirect
-    // Cookies are already set by createServerClient above
-    const redirectUrl = new URL('/', requestUrl.origin);
-    const response = NextResponse.redirect(redirectUrl);
-    
-    // Ensure cookies are included in the response
-    // The createServerClient already set them, but we'll make sure they're persisted
+    // Return response with cookies already set via the cookie handlers above
+    // This redirects to home page (/) with session cookies in place
     return response;
 
   } catch (error) {
