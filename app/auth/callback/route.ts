@@ -124,13 +124,20 @@ export async function GET(request: Request) {
         console.warn('⚠️ User profile not found (trigger may need time):', profileError?.message);
         
         // Manually create profile as fallback
+        // Get Google avatar from multiple possible metadata fields
+        const googleAvatar = data.user.user_metadata?.avatar_url || 
+                            data.user.user_metadata?.picture ||
+                            (data.user as any).raw_app_meta_data?.avatar_url ||
+                            (data.user as any).raw_app_meta_data?.picture ||
+                            null;
+        
         const { error: insertError } = await supabase.from('users').insert({
           id: data.user.id,
           email: data.user.email!,
           name: data.user.user_metadata?.full_name || 
                 data.user.user_metadata?.name || 
                 data.user.email!.split('@')[0],
-          avatar_url: data.user.user_metadata?.avatar_url || null,
+          avatar_url: googleAvatar,
         });
 
         if (!insertError) {

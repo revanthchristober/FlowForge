@@ -40,7 +40,7 @@ export default function UserMenu({ userEmail, colors, theme, onThemeChange, onSh
   const [showSettings, setShowSettings] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Fetch user profile
+  // Fetch user profile and Google avatar
   useEffect(() => {
     const fetchProfile = async () => {
       if (!userEmail) {
@@ -49,20 +49,79 @@ export default function UserMenu({ userEmail, colors, theme, onThemeChange, onSh
       }
 
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        // First, get the auth user to access user_metadata (Google profile data)
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !authUser) {
+          console.error('Error fetching auth user:', authError);
+          setIsLoading(false);
+          return;
+        }
 
-        const { data, error } = await supabase
+        // Get Google avatar from user_metadata (prioritize this)
+        // Google OAuth stores avatar in: user_metadata.avatar_url or user_metadata.picture
+        // Also check raw_app_meta_data which Supabase sometimes uses
+        const googleAvatarUrl = authUser.user_metadata?.avatar_url || 
+                                authUser.user_metadata?.picture ||
+                                (authUser as any).raw_app_meta_data?.avatar_url ||
+                                (authUser as any).raw_app_meta_data?.picture ||
+                                null;
+
+        // Debug logging (remove in production if needed)
+        if (googleAvatarUrl) {
+          console.log('✅ Found Google avatar:', googleAvatarUrl);
+        } else {
+          console.log('ℹ️ No Google avatar found in user_metadata:', {
+            hasUserMetadata: !!authUser.user_metadata,
+            userMetadataKeys: authUser.user_metadata ? Object.keys(authUser.user_metadata) : [],
+          });
+        }
+
+        // Get profile from database
+        const { data: dbProfile, error: dbError } = await supabase
           .from('users')
           .select('id, email, name, avatar_url')
-          .eq('id', user.id)
+          .eq('id', authUser.id)
           .single();
 
-        if (error) {
-          console.error('Error fetching profile:', error);
-        } else if (data) {
-          setProfile(data);
+        if (dbError && dbError.code !== 'PGRST116') {
+          // PGRST116 = no rows returned (not an error we care about)
+          console.error('Error fetching profile from database:', dbError);
         }
+
+        // Merge data: prioritize Google avatar from auth metadata, fallback to DB
+        const profileData: UserProfile = {
+          id: authUser.id,
+          email: authUser.email || userEmail,
+          name: dbProfile?.name || 
+                authUser.user_metadata?.full_name ||
+                authUser.user_metadata?.name ||
+                authUser.user_metadata?.display_name ||
+                null,
+          // Prioritize Google avatar from auth metadata, then DB, then null
+          avatar_url: googleAvatarUrl || dbProfile?.avatar_url || null,
+        };
+
+        // If we have Google avatar but not in DB, update DB for future use
+        if (googleAvatarUrl && (!dbProfile || !dbProfile.avatar_url)) {
+          // Silently update avatar_url in database (fire and forget)
+          supabase
+            .from('users')
+            .update({ 
+              avatar_url: googleAvatarUrl,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', authUser.id)
+            .then(({ error }) => {
+              if (error) {
+                console.warn('Failed to update avatar_url in database:', error);
+              } else {
+                console.log('✅ Updated avatar_url in database');
+              }
+            });
+        }
+
+        setProfile(profileData);
       } catch (error) {
         console.error('Failed to fetch profile:', error);
       } finally {
