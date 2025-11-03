@@ -492,9 +492,9 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
       {selectedNodeData && (
         <div style={{
           width: isSidebarOpen ? '280px' : '0px',
-          background: 'linear-gradient(180deg, #E8DEF8 0%, #EADDFF 100%)',
+          background: 'linear-gradient(180deg, var(--color-secondary-container) 0%, var(--color-primary-container) 100%)',
           padding: isSidebarOpen ? '20px' : '0',
-          borderLeft: isSidebarOpen ? '1px solid #CAC4D0' : 'none',
+          borderLeft: isSidebarOpen ? '1px solid var(--border-light)' : 'none',
           overflowY: 'auto',
           overflowX: 'hidden',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -627,11 +627,11 @@ export default function WorkflowBuilder({ nodes, edges, onNodesChange, onEdgesCh
                     </label>
                     <div style={{
                       padding: '10px 12px',
-                      background: '#E7E0EC',
+                      background: 'var(--color-surface-variant)',
                       borderRadius: '12px',
                       fontSize: '14px',
                       color: 'var(--text-secondary)',
-                      border: '1px solid #CAC4D0'
+                      border: '1px solid var(--border-light)'
                     }}>
                       {selectedNodeData.type}
                     </div>
