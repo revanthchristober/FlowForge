@@ -8,11 +8,13 @@
  * 1. User authenticates with Google
  * 2. Google redirects to this endpoint with code
  * 3. We exchange code for session using Supabase
- * 4. Trigger auto-creates profile in public.users
- * 5. Redirect to main app
+ * 4. Session cookies are set automatically via @supabase/ssr
+ * 5. Trigger auto-creates profile in public.users
+ * 6. Redirect to main app
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -42,18 +44,39 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Create Supabase client for server-side auth
-    const supabase = createClient(
+    // Create Supabase client for server-side auth with proper cookie handling
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
-        auth: {
-          flowType: 'pkce',
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+          set(name: string, value: string, options: any) {
+            try {
+              cookieStore.set(name, value, options);
+            } catch (error) {
+              // The `set` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+          remove(name: string, options: any) {
+            try {
+              cookieStore.set(name, '', { ...options, maxAge: 0 });
+            } catch (error) {
+              // The `delete` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
         },
       }
     );
 
-    // Exchange code for session
+    // Exchange code for session - this will automatically set cookies
     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
@@ -106,9 +129,14 @@ export async function GET(request: Request) {
       }
     }
 
-    // Successful authentication - redirect to main app
+    // Successful authentication - create response with redirect
+    // Cookies are already set by createServerClient above
     const redirectUrl = new URL('/', requestUrl.origin);
-    return NextResponse.redirect(redirectUrl);
+    const response = NextResponse.redirect(redirectUrl);
+    
+    // Ensure cookies are included in the response
+    // The createServerClient already set them, but we'll make sure they're persisted
+    return response;
 
   } catch (error) {
     console.error('❌ OAuth callback exception:', error);

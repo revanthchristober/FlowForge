@@ -175,10 +175,15 @@ export async function signInWithEmail(
  */
 export async function signInWithGoogle(redirectTo?: string): Promise<{ error: Error | null }> {
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    // Ensure we use the correct callback URL
+    const callbackUrl = redirectTo || `${window.location.origin}/auth/callback`;
+    
+    console.log('🔄 Initiating Google OAuth with redirectTo:', callbackUrl);
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectTo || `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -191,8 +196,18 @@ export async function signInWithGoogle(redirectTo?: string): Promise<{ error: Er
       return { error: new Error(error.message) };
     }
 
-    // Redirect happens automatically
-    console.log('🔄 Redirecting to Google...');
+    if (!data.url) {
+      console.error('❌ No OAuth URL returned');
+      return { error: new Error('Failed to get OAuth URL') };
+    }
+
+    // Redirect to Google OAuth consent screen
+    // Note: In browser environments, Supabase may auto-redirect, but we ensure it happens
+    if (typeof window !== 'undefined') {
+      window.location.href = data.url;
+    }
+    
+    console.log('🔄 Redirecting to Google OAuth:', data.url);
     return { error: null };
   } catch (error) {
     console.error('❌ Google OAuth exception:', error);
