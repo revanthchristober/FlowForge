@@ -1,0 +1,35 @@
+model_list:
+  # Strong model: planning, spec analysis, architecture
+  - model_name: forge/planner
+    litellm_params:
+      model: anthropic/claude-sonnet-4-6
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # Cheap model: bulk code generation
+  - model_name: forge/worker
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      max_budget: 5.0
+      budget_duration: 1d
+    # fallback if Groq is unavailable
+    model_info:
+      fallbacks: ["forge/planner"]
+
+  # Mid-tier: code review, LLM-as-judge, docs
+  - model_name: forge/judge
+    litellm_params:
+      model: anthropic/claude-haiku-4-5-20251001
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+litellm_settings:
+  drop_params: false
+  request_timeout: 120
+
+router_settings:
+  routing_strategy: simple-shuffle
+  fallbacks:
+    - {"forge/worker": ["forge/planner"]}
+
+general_settings:
+  store_model_in_db: false

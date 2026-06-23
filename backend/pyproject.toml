@@ -1,0 +1,63 @@
+[project]
+name = "forgeflow"
+version = "0.1.0"
+description = "ForgeFlow — AI Software Delivery Orchestration & Governance"
+requires-python = ">=3.11"
+dependencies = [
+    # Orchestration
+    "langgraph>=1.0",
+    "langgraph-checkpoint-postgres>=2.0",
+    # LLM gateway client
+    "openai>=1.50",        # OpenAI-compatible client → LiteLLM proxy
+    "litellm[proxy]>=1.50",       # also used directly in agents for metadata support
+    # Observability
+    "langfuse>=3.0",
+    # State validation
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    # API
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sse-starlette>=2.1",
+    # Database
+    "psycopg[binary,pool]>=3.1",
+    "pgvector>=0.3",
+    # Utilities
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+    "tenacity>=8.3",
+    "apscheduler>=3.11.2",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",          # TestClient
+    "ruff>=0.6",
+    "bandit>=1.7",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.4",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.15.18",
+]

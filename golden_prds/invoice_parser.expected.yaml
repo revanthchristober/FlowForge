@@ -1,0 +1,31 @@
+# Expected outputs for invoice_parser.md — used by the Phase 3 eval harness
+prd_id: invoice_parser
+
+must_have_epics:
+  - Parse
+  - Extract
+  - Validate
+  - Output
+
+must_have_tasks:
+  - "parse"
+  - "extract"
+  - "validate"
+  - "output"
+  - "csv"
+  - "json"
+
+required_doc_sections:
+  - Overview
+  - Install
+  - Run
+  - API
+
+# No seeded security bugs — this is a happy-path stdlib PRD
+seeded_findings: []
+
+thresholds:
+  prd_coverage: 0.65
+  review_precision: 1.0
+  build_test_pass: 0.5
+  doc_completeness: 0.65

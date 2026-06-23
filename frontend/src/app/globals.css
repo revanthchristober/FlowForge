@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-navy: #0B1A33;
+  --color-coral: #FF6B6B;
+  --color-cream: #FAF7F2;
+  --color-slate: #1E3A5F;
+  --color-muted: #8BA4C0;
+  --font-mono: var(--font-mono);
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0B1A33;
+  color: #FAF7F2;
+}
+
+code, pre {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+}

@@ -1,0 +1,33 @@
+# Expected outputs for mini_crm.md — used by the Phase 3 eval harness
+prd_id: mini_crm
+
+must_have_epics:
+  - Contacts
+  - Companies
+  - Notes
+  - Search
+
+must_have_tasks:
+  - "contact"
+  - "company"
+  - "note"
+  - "search"
+  - "create"
+  - "list"
+  - "delete"
+
+required_doc_sections:
+  - Overview
+  - Install
+  - Run
+  - API
+  - Environment
+
+# No seeded security bugs in mini CRM
+seeded_findings: []
+
+thresholds:
+  prd_coverage: 0.7
+  review_precision: 1.0
+  build_test_pass: 0.5
+  doc_completeness: 0.65

@@ -1,0 +1,33 @@
+# Expected outputs for todo_api.md — used by the Phase 3 eval harness
+prd_id: todo_api
+
+must_have_epics:
+  - CRUD
+  - Filter
+  - Validation
+  - Error
+
+must_have_tasks:
+  - "create endpoint"
+  - "list endpoint"
+  - "get by id"
+  - "update endpoint"
+  - "delete endpoint"
+  - "filter"
+  - "validation"
+
+required_doc_sections:
+  - Overview
+  - Install
+  - Run
+  - API
+  - Environment
+
+# For review_precision scorer (Phase 3)
+seeded_findings: []   # no seeded bugs in the happy-path PRD
+
+# Minimum acceptable scores (0.0–1.0)
+thresholds:
+  prd_coverage: 0.75
+  build_test_pass: 0.8
+  doc_completeness: 0.7

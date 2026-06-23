@@ -1,0 +1,34 @@
+# Expected outputs for auth_unsafe.md — used by the Phase 3 eval harness
+prd_id: auth_unsafe
+
+must_have_epics:
+  - Registration
+  - Login
+  - Auth
+
+must_have_tasks:
+  - "register"
+  - "login"
+  - "token"
+  - "database"
+
+required_doc_sections:
+  - Overview
+  - Install
+  - API
+
+# Seeded findings: code-gen on this PRD will naturally use raw sqlite3 + string
+# formatting → SQL injection (B608 bandit) + plaintext password storage (B105/B106)
+seeded_findings:
+  - category: security
+    severity: blocker
+    pattern: "SQL injection"   # bandit B608 or LLM catches string concat in SQL
+  - category: security
+    severity: major
+    pattern: "plaintext password"  # no hashing
+
+thresholds:
+  prd_coverage: 0.7
+  review_precision: 1.0    # reviewer MUST catch the SQL injection
+  build_test_pass: 0.5
+  doc_completeness: 0.6
