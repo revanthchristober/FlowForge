@@ -65,8 +65,8 @@ graph LR
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/your-org/eightgen-forgeflow
-cd eightgen-forgeflow
+git clone https://github.com/revanthchristober/FlowForge
+cd FlowForge
 cp .env.example .env
 # Edit .env: add ANTHROPIC_API_KEY, LANGFUSE keys
 
