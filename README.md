@@ -2,8 +2,6 @@
 
 **PRD-to-production multi-agent pipeline with governance, observability, and human-in-the-loop control.**
 
-> ⚠️ This is a 4-day POC built for an Eightgen AI engineering interview. Not client work.
-
 ---
 
 ## What it does
